@@ -3,26 +3,27 @@ import {
   Column,
   CreateDateColumn,
   Entity,
-  ManyToOne,
+  OneToMany,
   PrimaryGeneratedColumn,
+  Unique,
   UpdateDateColumn,
 } from 'typeorm';
-import { TaskStatus } from './dto/task-status-enum';
-import { User } from '../autht/autht.entity';
+import { Task } from '../tasks/task.entity';
 
 @Entity()
-export class Task extends BaseEntity {
+@Unique(['username'])
+export class User extends BaseEntity {
   @PrimaryGeneratedColumn()
   id: number;
 
   @Column()
-  title: string;
+  username: string;
 
   @Column()
-  description: string;
+  password: string;
 
   @Column()
-  status: TaskStatus;
+  salt: string;
 
   @CreateDateColumn()
   createdAt: Date;
@@ -30,6 +31,6 @@ export class Task extends BaseEntity {
   @UpdateDateColumn()
   updatedAt: Date;
 
-  @ManyToOne(() => User, (user) => user.tasks)
-  user: User;
+  @OneToMany(() => Task, (task) => task.user)
+  tasks: Task[];
 }
