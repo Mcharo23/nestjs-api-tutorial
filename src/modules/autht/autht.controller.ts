@@ -4,14 +4,13 @@ import {
   Get,
   Patch,
   Post,
-  Req,
   UseGuards,
   ValidationPipe,
 } from '@nestjs/common';
 import { AuthtService } from './autht.service';
 import { AuthCredentialsDto } from './dto/autht-credentials.dto';
 import { AuthGuard } from '@nestjs/passport';
-import { GetUser } from 'src/autht/get-user.decorator';
+import { GetUser } from 'src/modules/autht/get-user.decorator';
 import { User } from './autht.entity';
 
 @Controller('autht')
@@ -26,7 +25,9 @@ export class AuthtController {
   }
 
   @Get('/signin')
-  signin(@Body(ValidationPipe) authtCredentialsDto: AuthCredentialsDto) {
+  signin(
+    @Body(ValidationPipe) authtCredentialsDto: AuthCredentialsDto,
+  ): Promise<{ accessToken: string }> {
     return this.authtService.signin(authtCredentialsDto);
   }
 
@@ -41,7 +42,7 @@ export class AuthtController {
 
   @Post('/test')
   @UseGuards(AuthGuard())
-  test(@Req() req) {
-    console.log(req);
+  test(@GetUser() user: User) {
+    console.log(user);
   }
 }

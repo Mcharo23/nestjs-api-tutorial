@@ -2,6 +2,7 @@ import {
   ConflictException,
   Injectable,
   InternalServerErrorException,
+  Logger,
   UnauthorizedException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -9,11 +10,12 @@ import * as bcrypt from 'bcrypt';
 import { User } from './autht.entity';
 import { Repository } from 'typeorm';
 import { AuthCredentialsDto } from './dto/autht-credentials.dto';
-import { JwtService } from '@nestjs/jwt';
 import { JwtPayload } from './jwt-payload.interface';
+import { JwtService } from '@nestjs/jwt';
 
 @Injectable()
 export class AuthtService {
+  private logger = new Logger('AuthtService');
   constructor(
     @InjectRepository(User)
     private userRepository: Repository<User>,
@@ -55,10 +57,14 @@ export class AuthtService {
     });
 
     if (user && user.password === (await bcrypt.hash(password, user.salt))) {
-      console.log(user.password);
-      console.log(await bcrypt.hash(password, user.salt));
+      // console.log(user.password);
+      // console.log(await bcrypt.hash(password, user.salt));
       const payload: JwtPayload = { username };
-      const accessToken = this.jwtService.sign(payload);
+      const accessToken = await this.jwtService.sign(payload);
+
+      this.logger.debug(
+        `Generated JWT token with payloas ${JSON.stringify(payload)}`,
+      );
 
       return { accessToken };
     } else {

@@ -32,4 +32,7 @@ export class Task extends BaseEntity {
 
   @ManyToOne(() => User, (user) => user.tasks)
   user: User;
+
+  @Column()
+  userId: number;
 }
